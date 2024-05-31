@@ -8,26 +8,35 @@
 import SwiftUI
 
 struct ContentView: View {
-  let emojis = [
-    "👻", "🎃", "🕷️", "😈", "💀", "🕸️", "🧙", "🙀", "🦁", "😱", "☠️", "🍭"
-  ]
+  let flags = ["🇯🇵", "🇰🇷", "🇩🇪", "🇨🇳", "🇺🇸", "🇫🇷", "🇪🇸", "🇮🇹", "🇷🇺", "🇬🇧", "🇹🇼", "🇨🇦"]
+  let vehicles = ["🚐", "🚘", "🚙", "🛻", "🏎️", "🛵", "🛺", "🚲", "🚤", "🛥️", "🚢", "⛵"]
+  let sports = ["🏑", "🏓", "🥍", "🏸", "🎣", "⛸️", "🛷", "⚽", "⚾", "🥎", "🏀", "🏐"]
   
-  @State var card_count = 4
+  @State var emojis : [String] = []
   
   var body: some View {
     VStack {
+      Text("Memorize!").font(.largeTitle)
       ScrollView {
         cards
       }
       Spacer()
-      card_count_adjusters
+      HStack(alignment: .bottom) {
+        Spacer()
+        theme_button(flags, "Flags", "flag.filled.and.flag.crossed")
+        Spacer()
+        theme_button(vehicles, "Vehicles", "car")
+        Spacer()
+        theme_button(sports, "Sports", "basketball")
+        Spacer()
+      }
     }
     .padding()
   }
   
   var cards: some View {
-    LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))]) {
-      ForEach(0 ..< card_count, id: \.self) { i in
+    LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))]) {
+      ForEach(emojis.indices, id: \.self) { i in
         CardView(content: emojis[i])
           .aspectRatio(2/3, contentMode: .fit)
       }
@@ -35,37 +44,25 @@ struct ContentView: View {
     .foregroundColor(.orange)
   }
   
-  func card_count_adjuster(by offset: Int, symbol: String) -> some View {
+  func theme_button(
+    _ theme: [String],
+    _ text: String,
+    _ symbol: String
+  ) -> some View {
     Button(action: {
-      card_count += offset
+      emojis = (theme + theme).shuffled()
     }, label: {
-      Image(systemName: symbol)
+      VStack {
+        Image(systemName: symbol).font(.title)
+        Text(text)
+      }
     })
-    .disabled(card_count + offset < 1 || card_count + offset > emojis.count)
-  }
-  
-  var card_remover: some View {
-    card_count_adjuster(by: -1, symbol: "rectangle.stack.badge.minus.fill")
-  }
-  
-  var card_adder: some View {
-    card_count_adjuster(by: +1, symbol: "rectangle.stack.badge.plus.fill")
-  }
-  
-  var card_count_adjusters: some View {
-    HStack {
-      card_remover
-      Spacer()
-      card_adder
-    }
-    .imageScale(.large)
-    .font(.largeTitle)
   }
 }
 
 struct CardView: View {
   let content: String
-  @State var is_face_up = true
+  @State var is_face_up = false
   
   var body: some View {
     ZStack {
